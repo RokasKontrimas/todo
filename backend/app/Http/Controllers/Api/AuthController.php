@@ -7,9 +7,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class AuthController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('throttle:5,2')->only('register', 'login', 'logout');
+    }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -28,7 +34,10 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return response()->json(['message' => 'Registered successfully'], 201);
+        return response()->json([
+            'message' => 'Registered successfully',
+            'token' => $user->createToken("API TOKEN")->plainTextToken
+        ], 201);
     }
 
     public function login(Request $request)
@@ -56,4 +65,6 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Logged out successfully']);
     }
+
+
 }

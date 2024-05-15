@@ -27,12 +27,17 @@ const HeaderComponent = () => {
                                 <li><NavLink to='/register'>Register</NavLink></li>
                             </>
                         ) : (
-                            <li>
-                                <button onClick={(e) => {
-                                    handleLogOut(e)
-                                }}>Log out
-                                </button>
-                            </li>
+                            <>
+                                <li>
+                                    <button onClick={(e) => {
+                                        handleLogOut(e)
+                                    }}>Log out
+                                    </button>
+                                </li>
+                                <li>a</li>
+                                <li>b</li>
+                                <li>c</li>
+                            </>
                         )}
                     </ul>
                 </nav>
