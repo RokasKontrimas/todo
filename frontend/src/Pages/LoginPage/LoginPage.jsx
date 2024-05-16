@@ -5,24 +5,25 @@ import instance, {getCsrfToken} from '../../libs/axios/axios.js';
 import {useNavigate} from 'react-router-dom';
 import {useAuth} from '../../hooks/AuthContext.jsx';
 import LoadingComponent from "../../Components/LoadingComponent/LoadingComponent.jsx";
+import useRequireAuth from "../../hooks/UseRequireAuth.js";
+import UseRequireAuth from "../../hooks/UseRequireAuth.js";
+import Cookies from "js-cookie";
 
 const LoginPage = () => {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
-    const {login, isLoggedIn} = useAuth();
-    const {handleSubmit, setValue, clearErrors, setError, formState: {errors}} = useForm();
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate]);
+    const {login} = useAuth();
+    const {handleSubmit, setValue, setError, formState: {errors}} = useForm();
+
+
     const onLoginSubmit = async (data) => {
         setLoading(true)
         try {
             await getCsrfToken();
             const res = await instance.post('api/login', data);
             if (res.status === 200 || res.status === 201) {
-                login();
+                const {token, user} = res.data;
+                login(token, user);
                 navigate('/');
             }
         } catch (err) {
@@ -34,32 +35,34 @@ const LoginPage = () => {
             } else if (err.response && err.response.data.message) {
                 setError('login', {message: err.response.data.message});
             }
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <>
-                <form onSubmit={handleSubmit(onLoginSubmit)}>
-                    <TextInputLabeled
-                        labelName='Email'
-                        id='email'
-                        type='email'
-                        name='email'
-                        setValue={setValue}
-                        error={errors.email}
-                    />
-                    <TextInputLabeled
-                        labelName='Password'
-                        id='password'
-                        type='password'
-                        name='password'
-                        setValue={setValue}
-                        error={errors.password}
-                    />
-                    <button disabled={loading} type='submit'>Submit</button>
-                </form>
+            <form onSubmit={handleSubmit(onLoginSubmit)}>
+                <TextInputLabeled
+                    labelName='Email'
+                    id='email'
+                    type='email'
+                    name='email'
+                    setValue={setValue}
+                    error={errors.email}
+                />
+                <TextInputLabeled
+                    labelName='Password'
+                    id='password'
+                    type='password'
+                    name='password'
+                    setValue={setValue}
+                    error={errors.password}
+                />
+                <button disabled={loading} type='submit'>Submit</button>
+            </form>
+            {loading && <LoadingComponent/>}
         </>
-
     );
 };
 

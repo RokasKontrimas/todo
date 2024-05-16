@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useAuth} from "../../hooks/AuthContext.jsx";
 import LoadingComponent from "../../Components/LoadingComponent/LoadingComponent.jsx";
+import {useLocation} from "react-router-dom";
 
 const WelcomePage = () => {
     const {user, isLoading} = useAuth();
-
 
     useEffect(() => {
         if (user) {
