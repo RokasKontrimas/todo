@@ -9,18 +9,15 @@ const RegisterPage = () => {
     const [loading, setLoading] = useState(false)
     const {register, handleSubmit, watch, setValue,setError, formState: {errors}} = useForm();
     const navigate = useNavigate();
-    const {login, isLoggedIn,setUser} = useAuth();
+    const {login,setUser} = useAuth();
     const passwordValue = watch('Password');
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/');
-        }
-    }, [isLoggedIn, navigate]);
+
     const fetchUser = async () => {
         try {
-            const response = await instance.get('/api/user');
-            setUser(response.data);
-            login();
+            const res = await instance.get('/api/user');
+            setUser(res.data);
+            const { token, user } = res.data;
+            login(token, user);
             navigate('/');
         } catch (error) {
             setError('login', {message: "Failed to fetch user data"});
